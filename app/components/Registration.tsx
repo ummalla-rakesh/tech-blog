@@ -5,15 +5,13 @@ import { Input } from './ui/input';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from './ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form';
+
+interface FiledsList {
+  name: 'name' | 'email' | 'password' | 'profession';
+  placeholder: string;
+  type: string;
+}
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -35,9 +33,32 @@ const formSchema = z.object({
   }),
 });
 
+const fieldsList: FiledsList[] = [
+  {
+    name: 'name',
+    placeholder: 'Full Name',
+    type: 'text',
+  },
+  {
+    name: 'profession',
+    placeholder: 'Profession',
+    type: 'text',
+  },
+  {
+    name: 'email',
+    placeholder: 'Email',
+    type: 'email',
+  },
+  {
+    name: 'password',
+    placeholder: 'Password',
+    type: 'password',
+  },
+];
+
 export default function Registration() {
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -48,6 +69,7 @@ export default function Registration() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
   }
+  
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center lg:px-8">
@@ -56,58 +78,30 @@ export default function Registration() {
             Register your account
           </h2>
         </div>
-
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input placeholder="Full Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="profession"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input placeholder="Profession" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input placeholder="Email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input placeholder="Password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {fieldsList.map((item, index) => {
+                return (
+                  <FormField
+                    key={index}
+                    control={form.control}
+                    name={item.name}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type={item.type}
+                            placeholder={item.placeholder}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                );
+              })}
               <Button type="submit" className="w-full">
                 Register
               </Button>
