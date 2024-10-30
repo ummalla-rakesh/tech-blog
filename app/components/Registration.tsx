@@ -1,75 +1,79 @@
-'use client';
-import { Link } from '@remix-run/react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form';
+"use client";
+import { Link, useSubmit } from "@remix-run/react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+import React, { useRef } from "react";
 
 interface FiledsList {
-  name: 'name' | 'email' | 'password' | 'profession';
+  name: "name" | "email" | "password" | "profession";
   placeholder: string;
   type: string;
 }
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
+    message: "Username must be at least 2 characters.",
   }),
   email: z.string().email({
-    message: 'Invalid email address.',
+    message: "Invalid email address.",
   }),
   password: z
     .string()
     .min(6, {
-      message: 'Password must be at least 6 characters.',
+      message: "Password must be at least 6 characters.",
     })
     .regex(/^(?=.*[a-zA-Z])(?=.*[0-9])/, {
-      message: 'Password must contain at least one letter and one number.',
+      message: "Password must contain at least one letter and one number.",
     }),
   profession: z.string().min(2, {
-    message: 'Profession must be at least 2 characters.',
+    message: "Profession must be at least 2 characters.",
   }),
 });
 
 const fieldsList: FiledsList[] = [
   {
-    name: 'name',
-    placeholder: 'Full Name',
-    type: 'text',
+    name: "name",
+    placeholder: "Full Name",
+    type: "text",
   },
   {
-    name: 'profession',
-    placeholder: 'Profession',
-    type: 'text',
+    name: "profession",
+    placeholder: "Profession",
+    type: "text",
   },
   {
-    name: 'email',
-    placeholder: 'Email',
-    type: 'email',
+    name: "email",
+    placeholder: "Email",
+    type: "email",
   },
   {
-    name: 'password',
-    placeholder: 'Password',
-    type: 'password',
+    name: "password",
+    placeholder: "Password",
+    type: "password",
   },
 ];
 
 export default function Registration() {
+  const submit = useSubmit();
+  const formref = useRef<HTMLFormElement>(null);
   const form = useForm<z.infer<typeof formSchema>>({
-  resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      profession: '',
+      name: "",
+      email: "",
+      password: "",
+      profession: "",
     },
   });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    submit(formref.current);
   }
-  
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center lg:px-8">
@@ -80,7 +84,13 @@ export default function Registration() {
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              ref={formref}
+              action="/register"
+              method="post"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
+            >
               {fieldsList.map((item, index) => {
                 return (
                   <FormField
